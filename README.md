@@ -1,4 +1,4 @@
-# Shocurasy
+# Shōtokatan
 Functions that facilitate certain actions. Which needs to cite some parts for it to work.
 
 ## Features
@@ -31,5 +31,51 @@ Functions that facilitate certain actions. Which needs to cite some parts for it
 - **screen** Collects the cited coordinates of the corners. Useful to check the colors of pixels in a certain area.
 - **check_imports** Checks if pip(s) exists, if not, it does the installation if possible.
 - **check_def** Look for "def" in the file behind the return.
+- **read_midi** reads the desired midi file and returns with notes and click time
+- **play_sheet** plays the music with the notes and the click time informed. For its operation, a piano with transpose is required that works on the keyboard arrows.
+- **search_files** based on the given directory and the given search information, it creates a list of the files.
+- **pags** with the list of items and the limit items in each page quoted, it will return the required value of pages for all items.
+- **show_pages** with the list of items, the number of pages and the number of the desired page, it will show the items in the list corresponding to the page.
+- **shou_pages** is a function based on the values ​​received (type file=None, path=None, range_list=None), it shows the pages and their contents, which you can navigate between the pages and do searches for a file, after citing the selected file numbering, it returns the file name.
+- **check_updates_packages** check if you need to update any package and it tells you
+
+## Examples of How To Use some functions.
+
+
+```python
+import Shotokatan as Shtan
+
+
+files = Shtan.search_files('b') #will make a list with files that have the letter "b"
+
+file = Shtan.shou_pages('.mid', '.',)
+
+output = Shtan.console('start notepad')
+
+clock = Shtan.check_time() # output : 16:30
+
+data = Shtan.check_date('%Y-%m-%d') # output: 2022-04-17
+
+Shtan.openweb('T', 'youtube.com', 'chrome') # pressing T, he will open youtube on chrome
+
+Shtan.click(600, 500) # mouse click on X, Y
+
+hex_color = Shtan.rgb_to_hex((255, 0, 0)) #return red color (255,0 , 0) in to hex
+
+rgb_color = Shtan.hex_to_rgb(hex_color)
+
+float_value = Shtan.random_num(0, 100, 2) # output: random float value
+
+int_value = Shtan.random_num(0, 100, 1) # output: random int value
+
+content = Shtan.read_midi('file.txt') # output: abc123 --> (file_content)
+
+color_pixel = Shtan.detect_pixel(500, 500) # output: some color on that pixel. Ex: (100, 50, 255)
+
+Shtan.write_file(['Hello', '123', '44pb'], 'some.txt', 1, '/game') # write content ['Hello', '123', '44pb'], in /game/some.txt and keep content on some.txt.
+
+Shtan.write_file(['Hello', '123', '44pb'], 'some.txt', 0, '/game') # write content ['Hello', '123', '44pb'], in /game/some.txt and delete everything content on some.txt.
+
+```
 
 Developed by Aleph from Lotexiu(c) 2020
