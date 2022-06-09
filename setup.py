@@ -7,7 +7,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
     long_description = "\n" + fh.read()
 
-VERSION = '0.2.3'
+VERSION = '0.3.5'
 DESCRIPTION = 'Shortcuts funcitions.'
 LONG_DESCRIPTION = 'These are functions that facilitate certain actions. Which needs to cite some parts for it to work.'
 
@@ -16,7 +16,7 @@ setup(
     name="Shōtokatan",
     version=VERSION,
     author="Aleph (Lotexiu)",
-    author_email="<alephcostamelo@gmail.com>",
+    author_email="alephcostamelo@gmail.com",
     description=DESCRIPTION,
     long_description_content_type="text/markdown",
     long_description=long_description,
