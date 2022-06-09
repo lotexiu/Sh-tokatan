@@ -1,8 +1,18 @@
 # Shōtokatan
 Functions that facilitate certain actions. Which needs to cite some parts for it to work.
 
+## Update 0.3.5
+- ### Play_sheet()
+- Fixed pause/resume system
+- Fixed pressed notes (when its stopped the song)
+- Rewind add
+- Advance add
+- Show Length song add
+- convertmillis function add
+
 ## Features
 
+- New **convertmillis** convert milliseconds in seconds, minutes and hours Ex: (convertmillis(62000) -> output: (00, 01, 02))
 - **crypto_key** create a key of any size.
 - **sql_create_values** generates the value within the cited table and columns.
 - **sql_create_table** create the table and its columns.
