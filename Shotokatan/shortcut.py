@@ -775,7 +775,7 @@ def play_sheet(notes, tempos, tom=-12):
     current_ms = 0
 
     old_time = ''
-    while id_note <= last_note:
+    while id_note < last_note-1:
         # Delete = Stop forever
         # pause = Resume/Pause
         id_note += 1
@@ -787,7 +787,7 @@ def play_sheet(notes, tempos, tom=-12):
                 if keyboard.is_pressed(fix_stop):
                     directinput.keyUp(fix_stop)
             while True:
-                tempo(20)
+                tempo(15)
                 if id_note >= last_note:
                     id_note = last_note
                 else:
@@ -808,7 +808,7 @@ def play_sheet(notes, tempos, tom=-12):
                 if keyboard.is_pressed(fix_stop):
                     directinput.keyUp(fix_stop)
             while True:
-                tempo(20)
+                tempo(15)
                 if id_note <= 0:
                     id_note = 0
                 else:
