@@ -3,7 +3,6 @@
 # 0x27 RIGHT ARROW key
 # 0x28 DOWN ARROW key
 
-
 def decrypt(file, key, path=None):
     print('Descriptografando...')
     special_ch = '!@#$%&*'
@@ -740,14 +739,23 @@ def read_midi(file):
     return note_on, tempo
 
 
-def play_sheet(notes, tempos, tom=0):
+def play_sheet(notes, tempos, tom=-12):
     """plays the music with the notes and the click time informed.
-     For its operation, a piano with transpose is required that works on the keyboard arrows."""
+     For its operation, a piano with transpose is required that works on the keyboard arrows.\n
+     Delete = Stop forever\n
+     Pause = Resume/Pause\n
+     PageUp = Advance\n
+     PageDown = Rewind"""
     import keyboard
     import pydirectinput as directinput
 
     for variables in notes:
         exec(f'note{variables} = 0')
+
+    ms = 0
+    for total_time in range(len(tempos)):
+        ms += tempos[total_time]
+    end_song = f'{convertmillis(ms)[0]}:{convertmillis(ms)[1]}:{convertmillis(ms)[2]}'
 
     directinput.PAUSE = 0.000
     transpose = 0
@@ -758,18 +766,79 @@ def play_sheet(notes, tempos, tom=0):
             'k', 'l', 'shift + l', 'z', 'shift + z', 'x', 'c', 'shift + c', 'v', 'shift + v', 'b', 'shift + b',
             'n', 'm']
 
-    for id_note in range(len(notes)):
-        if keyboard.is_pressed('del'):
+    print('Pause = Resume/Pause')
+    print('PageUp = Advance')
+    print('PageDown = Rewind\n')
+
+    last_note = len(notes)
+    id_note = -1
+    current_ms = 0
+
+    old_time = ''
+    while id_note <= last_note:
+        # Delete = Stop forever
+        # pause = Resume/Pause
+        id_note += 1
+        current_ms += tempos[id_note]
+        current_time = f'{convertmillis(current_ms)[0]}:{convertmillis(current_ms)[1]}:{convertmillis(current_ms)[2]}'
+
+        if keyboard.is_pressed('PageUp'):
+            for fix_stop in keys:
+                if keyboard.is_pressed(fix_stop):
+                    directinput.keyUp(fix_stop)
+            while True:
+                tempo(20)
+                if id_note >= last_note:
+                    id_note = last_note
+                else:
+                    if eval(f'note{notes[id_note]}') == 0:
+                        exec(f'note{notes[id_note]} = 1')
+                    else:
+                        exec(f'note{notes[id_note]} = 0')
+                    id_note += 1
+                    current_ms += tempos[id_note]
+                    current_time = f'{convertmillis(current_ms)[0]}:{convertmillis(current_ms)[1]}:{convertmillis(current_ms)[2]}'
+                if old_time != current_time:
+                    print(f'Advance {current_time} / {end_song}')
+                    old_time = current_time
+                if not keyboard.is_pressed('PageUp'):
+                    break
+        elif keyboard.is_pressed('PageDown'):
+            for fix_stop in keys:
+                if keyboard.is_pressed(fix_stop):
+                    directinput.keyUp(fix_stop)
+            while True:
+                tempo(20)
+                if id_note <= 0:
+                    id_note = 0
+                else:
+                    current_ms -= tempos[id_note]
+                    id_note -= 1
+                    if eval(f'note{notes[id_note]}') == 0:
+                        exec(f'note{notes[id_note]} = 1')
+                    else:
+                        exec(f'note{notes[id_note]} = 0')
+                    current_time = f'{convertmillis(current_ms)[0]}:{convertmillis(current_ms)[1]}:{convertmillis(current_ms)[2]}'
+                if old_time != current_time:
+                    print(f'Rewind {current_time} / {end_song}')
+                    old_time = current_time
+                if not keyboard.is_pressed('PageDown'):
+                    break
+        elif keyboard.is_pressed('del'):
             print('stopped!')
             break
-        if keyboard.is_pressed('pause'):
+        elif keyboard.is_pressed('pause'):
             print('Paused!')
-            tempo(250)
+            tempo(400)
             while True:
                 if keyboard.is_pressed('pause'):
                     print('Resume!')
-                    tempo(250)
+                    tempo(300)
                     break
+        elif old_time != current_time:
+            print(f'{current_time} / {end_song}')
+            old_time = current_time
+
         tempo(tempos[id_note])
         if eval(f'note{notes[id_note]}') == 0:
             exec(f'note{notes[id_note]} = 1')
@@ -794,20 +863,32 @@ def play_sheet(notes, tempos, tom=0):
                     break
 
             if notes[id_note] < 24:
-                keyboard.press(keys[0])
+                directinput.keyDown(keys[0])
             elif notes[id_note] > 84:
-                keyboard.press(keys[-1])
+                directinput.keyDown(keys[-1])
             else:
-                keyboard.press(keys[notes[id_note]-24])
+                if '+' in keys[notes[id_note] - 24]:
+                    directinput.keyDown(keys[notes[id_note] - 24][0:keys[notes[id_note] - 24].index('+') - 1])
+                    directinput.keyDown(keys[notes[id_note] - 24][keys[notes[id_note] - 24].index('+')+2:])
+                else:
+                    directinput.keyDown(keys[notes[id_note] - 24])
 
         else:
             exec(f'note{notes[id_note]} = 0')
             if notes[id_note] < 24:
-                keyboard.release(keys[0])
+                directinput.keyUp(keys[0])
             elif notes[id_note] > 84:
-                keyboard.release(keys[-1])
+                directinput.keyUp(keys[-1])
             else:
-                keyboard.release(keys[notes[id_note] - 24])
+                if '+' in keys[notes[id_note] - 24]:
+                    directinput.keyUp(keys[notes[id_note] - 24][0:keys[notes[id_note] - 24].index('+') - 1])
+                    directinput.keyUp(keys[notes[id_note] - 24][keys[notes[id_note] - 24].index('+')+2:])
+                else:
+                    directinput.keyUp(keys[notes[id_note] - 24])
+
+    for fix_stop in keys:
+        if keyboard.is_pressed(fix_stop):
+            directinput.keyUp(fix_stop)
     while True:
         set = 0
         if transpose < set:
@@ -862,6 +943,7 @@ def show_pages(content_list, total_pages, num_pag='!p1', search=None):
     choose = '!p2'\n
     Shotokatan.show_pages(x, total_pags, choose, 'hanz')"""
     print('\nfiles:')
+    num_pag = num_pag.lower()
     range_page = 0
     while True:
         range_page += 1
@@ -927,3 +1009,16 @@ def check_updates_package():
     """check if you need to update any package and it tells you"""
     console('pip list --outdated')
     print('\npip install package --upgrade')
+
+
+def convertmillis(millis):
+    seconds = int((millis / 1000) % 60)
+    minutes = int((millis / (1000 * 60)) % 60)
+    hours = int((millis / (1000 * 60 * 60)) % 24)
+    if seconds < 10:
+        seconds = f'0{seconds}'
+    if minutes < 10:
+        minutes = f'0{minutes}'
+    if hours < 10:
+        hours = f'0{hours}'
+    return hours, minutes, seconds
