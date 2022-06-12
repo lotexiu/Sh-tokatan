@@ -1,9 +1,11 @@
 # Shōtokatan
 Functions that facilitate certain actions. Which needs to cite some parts for it to work.
 
-## Update 0.3.5
+## Update 0.3.8
+- ### Read_midi
+- Fixed Wrong Tempo
 - ### Play_sheet()
-- Fixed End Song (list index out of range)
+- Fixed Wrong Tempo
 
 ## Features
 

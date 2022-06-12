@@ -735,7 +735,9 @@ def read_midi(file):
             else:
                 note_on += [int(sheet[sheet.index('=')+8:sheet.index('v')-1])]
             tempo += [int(float(sheet[sheet.index('m') + 3:])*1000)]
-
+        elif 'tempo' in sheet:
+            note_on += ['tempo']
+            tempo += [int(float(sheet[sheet.index('i') + 4:-1])*1000)]
     return note_on, tempo
 
 
@@ -770,12 +772,12 @@ def play_sheet(notes, tempos, tom=-12):
     print('PageUp = Advance')
     print('PageDown = Rewind\n')
 
-    last_note = len(notes)
+    last_note = len(notes) - 1
     id_note = -1
     current_ms = 0
 
     old_time = ''
-    while id_note < last_note-1:
+    while id_note < last_note:
         # Delete = Stop forever
         # pause = Resume/Pause
         id_note += 1
@@ -840,55 +842,67 @@ def play_sheet(notes, tempos, tom=-12):
             old_time = current_time
 
         tempo(tempos[id_note])
-        if eval(f'note{notes[id_note]}') == 0:
-            exec(f'note{notes[id_note]} = 1')
-            if notes[id_note] < 24:
-                set = notes[id_note] - 24
-            elif notes[id_note] > 84:
-                set = notes[id_note] - 84
-            else:
-                set = 0
-
-            while True:
-                if transpose < set + tom:
-                    transpose += 1
-                    directinput.keyDown('up')
-                    directinput.keyUp('up')
-
-                elif transpose > set + tom:
-                    transpose -= 1
-                    directinput.keyDown('down')
-                    directinput.keyUp('down')
-                else:
-                    break
-
-            if notes[id_note] < 24:
-                directinput.keyDown(keys[0])
-            elif notes[id_note] > 84:
-                directinput.keyDown(keys[-1])
-            else:
-                if '+' in keys[notes[id_note] - 24]:
-                    directinput.keyDown(keys[notes[id_note] - 24][0:keys[notes[id_note] - 24].index('+') - 1])
-                    directinput.keyDown(keys[notes[id_note] - 24][keys[notes[id_note] - 24].index('+')+2:])
-                else:
-                    directinput.keyDown(keys[notes[id_note] - 24])
-
+        if notes[id_note] == 'tempo':
+            pass
         else:
-            exec(f'note{notes[id_note]} = 0')
-            if notes[id_note] < 24:
-                directinput.keyUp(keys[0])
-            elif notes[id_note] > 84:
-                directinput.keyUp(keys[-1])
-            else:
-                if '+' in keys[notes[id_note] - 24]:
-                    directinput.keyUp(keys[notes[id_note] - 24][0:keys[notes[id_note] - 24].index('+') - 1])
-                    directinput.keyUp(keys[notes[id_note] - 24][keys[notes[id_note] - 24].index('+')+2:])
+            if eval(f'note{notes[id_note]}') == 0:
+                exec(f'note{notes[id_note]} = 1')
+                if notes[id_note] < 24:
+                    set = notes[id_note] - 24
+                elif notes[id_note] > 84:
+                    set = notes[id_note] - 84
                 else:
-                    directinput.keyUp(keys[notes[id_note] - 24])
+                    set = 0
+
+                while True:
+                    if transpose < set + tom:
+                        transpose += 1
+                        directinput.keyDown('up')
+                        directinput.keyUp('up')
+
+                    elif transpose > set + tom:
+                        transpose -= 1
+                        directinput.keyDown('down')
+                        directinput.keyUp('down')
+                    else:
+                        break
+
+                if notes[id_note] < 24:
+                    directinput.keyDown(keys[0])
+                elif notes[id_note] > 84:
+                    directinput.keyDown(keys[-1])
+                else:
+                    if '+' in keys[notes[id_note] - 24]:
+                        directinput.keyDown(keys[notes[id_note] - 24][0:keys[notes[id_note] - 24].index('+') - 1])
+                        directinput.keyDown(keys[notes[id_note] - 24][keys[notes[id_note] - 24].index('+')+2:])
+                    else:
+                        directinput.keyDown(keys[notes[id_note] - 24])
+
+            else:
+                exec(f'note{notes[id_note]} = 0')
+                if notes[id_note] < 24:
+                    directinput.keyUp(keys[0])
+                elif notes[id_note] > 84:
+                    directinput.keyUp(keys[-1])
+                else:
+                    if '+' in keys[notes[id_note] - 24]:
+                        directinput.keyUp(keys[notes[id_note] - 24][0:keys[notes[id_note] - 24].index('+') - 1])
+                        directinput.keyUp(keys[notes[id_note] - 24][keys[notes[id_note] - 24].index('+')+2:])
+                    else:
+                        directinput.keyUp(keys[notes[id_note] - 24])
 
     for fix_stop in keys:
-        if keyboard.is_pressed(fix_stop):
-            directinput.keyUp(fix_stop)
+        if '+' in fix_stop:
+            part1 = fix_stop[0:fix_stop.index('+') - 1]
+            part2 = fix_stop[fix_stop.index('+') + 2:]
+            if keyboard.is_pressed(part1):
+                directinput.keyUp(part1)
+            if keyboard.is_pressed(part2):
+                directinput.keyUp(part2)
+        else:
+            if keyboard.is_pressed(fix_stop):
+                directinput.keyUp(fix_stop)
+
     while True:
         set = 0
         if transpose < set:
