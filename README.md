@@ -1,14 +1,24 @@
 # Shōtokatan
 Functions that facilitate certain actions. Which needs to cite some parts for it to work.
 
-## Update 0.3.8
-- ### Read_midi
-- Fixed Wrong Tempo
-- ### Play_sheet()
-- Fixed Wrong Tempo
+## Update 0.4.9
+- ### Console()
+- Fixed cd command
+- ### MySQL Functions
+- mysql_create_value
+- mysql_create_tables
+- mysql_show_database
+- mysql_show_tables
+- ### Others Functions
+- fix_name_files
 
 ## Features
 
+- NEW **mysql_create_value**
+- NEW **mysql_create_tables**
+- NEW **mysql_show_database**
+- NEW **mysql_show_tables**
+- NEW **fix_name_files** Will replace "undelines" with space and make the first letters of words uppercase.
 - **convertmillis** convert milliseconds in seconds, minutes and hours Ex: (convertmillis(62000) -> output: (00, 01, 02))
 - **crypto_key** create a key of any size.
 - **sql_create_values** generates the value within the cited table and columns.
@@ -51,6 +61,55 @@ Functions that facilitate certain actions. Which needs to cite some parts for it
 
 ```python
 import Shotokatan as Shtan
+
+# MySQL ---------
+
+info = [
+    "host=localhost",
+    "user=root",
+    "passwd=159"
+]
+
+basedata = 'yup_test'
+
+table = [
+    "tablename=People",
+    "age INT(100) NULL, name TEXT",
+    "COMMENT='comment'"
+]
+
+Shtan.mysql_create_tables(table, basedata, info)
+
+data = shoto.mysql_show_tables(basedata, info)
+print(data)
+
+data = shoto.mysql_show_database(info)
+print(data)
+
+# MySQL ----------
+
+
+# SQLITE --------
+
+file = 'test.db'
+
+Shtan.sql_create_table(file, 'People', ['Name, Age, weight'], ['int', 'str', 'float'])
+
+tables = Shtan.sql_show_tables(file)
+print(tables)
+
+People = Shtan.sql_read_table(file, 'Clientes')
+print(People)
+
+Shtan.sql_create_values(file, 'People', ['Name', 'Age'], ['Osvaldo', '20'])
+
+Shtan.sql_update_value(file, 'People', 'Name', 'Finn', 'weight', '20')
+
+Shtan.sql_delete_value(file, 'People', 'Name', 'Osvaldo')
+
+Shtan.sql_delete_table(file, 'People')
+
+# SQLITE --------
 
 
 files = Shtan.search_files('b') #will make a list with files that have the letter "b"

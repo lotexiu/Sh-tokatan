@@ -7,7 +7,7 @@ here = os.path.abspath(os.path.dirname(__file__))
 with codecs.open(os.path.join(here, "README.md"), encoding="utf-8") as fh:
     long_description = "\n" + fh.read()
 
-VERSION = '0.3.8'
+VERSION = '0.4.9'
 DESCRIPTION = 'Shortcuts funcitions.'
 LONG_DESCRIPTION = 'These are functions that facilitate certain actions. Which needs to cite some parts for it to work.'
 

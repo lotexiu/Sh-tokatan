@@ -473,9 +473,7 @@ def console(command='start notepad'):
     import os
 
     comando = command
-    if comando.lower() == "sair":
-        exit()
-    elif 'cd..' in comando:
+    if 'cd..' in comando:
         comando = os.getcwd()
         value = comando.count('\\')
         x = 0
@@ -487,10 +485,10 @@ def console(command='start notepad'):
                 break
             else:
                 back += characters
-        os.chdir(back)
-    elif 'cd' in comando:
+        output = os.chdir(back)
+    elif 'cd ' in comando:
         comando = comando.replace('cd ', '')
-        os.chdir(comando)
+        output = os.chdir(comando)
     else:
         output = os.system(comando)
         if output == 0:  # if works
@@ -1036,3 +1034,172 @@ def convertmillis(millis):
     if hours < 10:
         hours = f'0{hours}'
     return hours, minutes, seconds
+
+
+def mysql_show_tables(database, connection):
+    """info = ["host=localhost","user=root","passwd=159"]\n
+    mysql_show_tables("test", info)
+    """
+    import mysql.connector
+
+
+    f = f'mysql.connector.connect('
+    for connect in connection:
+        f += connect[0:connect.index('=')+1]
+        f += f'"{connect[connect.index("=") + 1:]}", '
+    f += f'database="{database}")'
+    conexao = eval(f)
+
+    cursor = conexao.cursor()
+
+    f = f'cursor.execute("""SHOW TABLES;""")'
+    exec(f)
+
+    a = []
+    for table in cursor.fetchall():
+        a += [table[0]]
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+    return a
+
+
+def mysql_show_database(connection):
+    """info = ["host=localhost","user=root","passwd=159"]\n
+    mysql_show_tables("test", info)
+    """
+    import mysql.connector
+
+
+    f = f'mysql.connector.connect('
+    for connect in connection:
+        f += connect[0:connect.index('=')+1]
+        if connect == connection[-1]:
+            f += f'"{connect[connect.index("=") + 1:]}"'
+        else:
+            f += f'"{connect[connect.index("=") + 1:]}", '
+    f += f')'
+    conexao = eval(f)
+
+    cursor = conexao.cursor()
+
+    f = f'cursor.execute("""SHOW DATABASES;""")'
+    exec(f)
+
+    a = []
+    for table in cursor.fetchall():
+        a += [table[0]]
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+    return a
+
+
+def mysql_create_tables(table, database, connection):
+    """
+    table = ['tablename=people', Name, Id ]
+    info = ["host=localhost","user=root","passwd=159"]\n
+    mysql_show_tables("test", info)
+    """
+    import mysql.connector
+
+
+    f = f'mysql.connector.connect('
+    for connect in connection:
+        f += connect[0:connect.index('=')+1]
+        f += f'"{connect[connect.index("=") + 1:]}", '
+    f += f'database="{database}")'
+    conexao = eval(f)
+
+    cursor = conexao.cursor()
+
+    f = f'cursor.execute("CREATE TABLE IF NOT EXISTS '
+
+    if 'tablename=' in table[0]:
+        f += table[0][table[0].index('=')+1:]
+        f += ' ( '
+    else:
+        return 'Error: "tablaname" must to be first'
+
+    f += f'{table[1]} ) '
+    if table[1] != table[-1]:
+        f += table[-1]
+    f += '");'
+    exec(f)
+
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+
+
+def mysql_create_value(value, table, database, connection):
+    """
+    table = ['tablename=people', Name, Id ]
+    info = ["host=localhost","user=root","passwd=159"]\n
+    mysql_show_tables("test", info)
+    """
+    import mysql.connector
+
+
+    f = f'mysql.connector.connect('
+    for connect in connection:
+        f += connect[0:connect.index('=')+1]
+        f += f'"{connect[connect.index("=") + 1:]}", '
+    f += f'database="{database}")'
+    conexao = eval(f)
+
+    cursor = conexao.cursor()
+
+    conexao.commit()
+    cursor.close()
+    conexao.close()
+
+
+def fix_name_files(folder='music', path='nothing'):
+    """Will replace "undelines" with space and make the first letters of words uppercase.\n
+    If the folder has above the py file (which is running), it doesn't need the path.\n
+    - **fix_name_files('songs', 'C:')**
+    exemple:\n
+    before = rockester_beam.mp3\n
+    after = Rockester Beam.mp3
+    """
+    alpha = folder
+    type_file = '.'
+    if path == 'nothing':
+        console(f'cd {alpha}')
+    else:
+        console(f'cd {path}/{alpha}')
+    files = search_files()
+    cheked = []
+    x = 0
+    while True:
+        for file in files:
+            try:
+                if file not in cheked:
+                    console(f'cd {file}')
+                    cheked += [file]
+                    files = search_files()
+                    x += 1
+                    break
+                else:
+                    pass
+            except:
+                if "_" in file:
+                    name = ''
+                    for fix in file:
+                        if fix == '_':
+                            name += ' '
+                        else:
+                            name += fix
+                    name = name.title()
+                else:
+                    name = file.title()
+                console(f'rename "{file}" "{name}"')
+
+        if len(files) == 0 or file == files[-1]:
+            x -= 1
+            console('cd..')
+            files = search_files()
+        if x == -1:
+            break
+    print('DONE!')
